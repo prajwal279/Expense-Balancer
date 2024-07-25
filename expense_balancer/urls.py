@@ -1,19 +1,3 @@
-"""
-URL configuration for expense_balancer project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
 from expenses import views
@@ -24,7 +8,8 @@ urlpatterns = [
     path('home/',views.HomePage,name='home'),
     path('logout/',views.LogoutPage,name='logout'),
     path('groups/create/', views.create_group, name='create_group'),    
-    path('delete/<int:group_id>/', views.delete_group, name='delete_group'),
+    path('groups/delete/<int:group_id>/', views.delete_group, name='delete_group'),
+    path('groups/edit/<int:group_id>/', views.edit_group, name='edit_group'),
     path('friends/add/', views.add_friend, name='add_friend'),
     path('friends/', views.friend_list, name='friend_list'),
 ]

@@ -1,0 +1,15 @@
+<!-- edit_group.html -->
+
+<form method="post">
+    {% csrf_token %}
+    <label for="name">Group Name:</label>
+    <input type="text" id="name" name="name" value="{{ group.name }}" required>
+        <label for="friends">Select Friends to Add:</label>
+        <select id="friends" name="friends" multiple>
+            {% for friend in friends %}
+                <option value="{{ friend.user1.id }}" {% if friend.user1 in group.members.all %} selected {% endif %}>{{ friend.user1.username }}</option>
+            {% endfor %}
+        </select>
+    
+    <button type="submit">Save Changes</button>
+</form>

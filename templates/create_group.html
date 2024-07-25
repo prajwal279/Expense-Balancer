@@ -44,6 +44,20 @@
             </li>
         {% endfor %}
     </ul>
+    <hr>
+    <ul>
+        {% for group in groups %}
+            <li>
+                <strong>{{ group.name }}</strong>
+                <ul>
+                    {% for member in group.members.all %}
+                        <li>{{ member.username }}</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'edit_group' group.id %}" class="btn btn-danger">Edit Group</a>
+            </li>
+        {% endfor %}
+    </ul>
         
 </body>
 </html>

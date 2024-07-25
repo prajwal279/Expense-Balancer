@@ -43,6 +43,7 @@ def LoginPage(request):
 @login_required
 def create_group(request):
     groups = request.user.group_members.all()
+    print(request.user.id)
     friends = request.user.friends2.all()
     if request.method == 'POST':
         group_name = request.POST.get('name')
@@ -65,6 +66,30 @@ def delete_group(request, group_id):
         return redirect('home')
 
     return render(request, 'delete_group.html', {'group': group})
+
+
+@login_required
+def edit_group(request, group_id):
+    group = get_object_or_404(Group, pk=group_id)
+
+    friends = request.user.friends2.all()  
+    group_members = group.members.all()    
+
+    if request.method == 'POST':
+        group_name = request.POST.get('name')
+        if group_name != group.name:
+            existing_group = Group.objects.filter(name=group_name).exists()
+            if existing_group:
+                return HttpResponse("Group with this name already exists!")
+            group.name = group_name
+            group.save()
+
+        # Update group members
+        new_members = request.POST.getlist('friends')
+        new_members.append(request.user)
+        group.members.set(new_members)
+        return redirect('home')
+    return render(request, 'edit_group.html', {'group': group, 'friends': friends, 'group_members': group_members})
 
 
 @login_required
