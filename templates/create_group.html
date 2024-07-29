@@ -27,7 +27,6 @@
                 <li>No friends available.</li>
             {% endfor %}
         </ul>
-        
         <button type="submit">Create Group</button>
     </form>
     <hr>
@@ -41,35 +40,10 @@
                     {% endfor %}
                 </ul>
                 <a href="{% url 'delete_group' group.id %}" class="btn btn-danger">Delete Group</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <hr>
-    <ul>
-        {% for group in groups %}
-            <li>
-                <strong>{{ group.name }}</strong>
-                <ul>
-                    {% for member in group.members.all %}
-                        <li>{{ member.username }}</li>
-                    {% endfor %}
-                </ul>
                 <a href="{% url 'edit_group' group.id %}" class="btn btn-danger">Edit Group</a>
+                <a href="{% url 'create_expense' group.id %}" class="btn btn-primary">Split an Expense</a>
             </li>
         {% endfor %}
     </ul>
-        
 </body>
 </html>
-
-
-
- {% comment %} <form method="post">
-        {% csrf_token %}
-        <label>Group Name:</label>
-        <input type="text" id="id_name" name="name" required><br><br>
-        {% comment %} <button type="submit">Create Group</button> {% endcomment %}
-        {% comment %} <button type="submit">Add friend</button> {% endcomment %}
-        {% comment %} <a href="{% url 'create_group' %}" class="btn btn-primary">create group</a>
-        <a href="{% url 'add_friend' %}" class="btn btn-primary">Add friend</a>
-    </form> {% endcomment %} 

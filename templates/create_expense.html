@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Expense</title>
+    <script>
+        function updateFields() {
+            var splitMethod = document.getElementById('id_split_method').value;
+            document.getElementById('equal_splits').style.display = splitMethod === 'E' ? 'block' : 'none';
+            document.getElementById('percentage_splits').style.display = splitMethod === 'P' ? 'block' : 'none';
+            document.getElementById('custom_splits').style.display = splitMethod === 'C' ? 'block' : 'none';
+        }
+
+        window.onload = function() {
+            updateFields(); 
+        }
+    </script>
+</head>
+<body>
+    <h1>Create Expense for {{ group.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {{ form.as_p }}
+
+        <div id="equal_splits" style="display: {% if form.instance.split_method == 'E' %}block{% else %}none{% endif %};">
+            <label for="id_equal_splits">Equal Splits:</label>
+            {{ form.equal_splits }}
+            {% if form.errors.equal_splits %}
+                <p style="color: red;">{{ form.errors.equal_splits }}</p>
+            {% endif %}
+        </div>
+
+        <div id="percentage_splits" style="display: {% if form.instance.split_method == 'P' %}block{% else %}none{% endif %};">
+            <label for="id_percentage_splits">Percentage Splits:</label>
+            {{ form.percentage_splits }}
+            {% if form.errors.percentage_splits %}
+                <p style="color: red;">{{ form.errors.percentage_splits }}</p>
+            {% endif %}
+        </div>
+
+        <div id="custom_splits" style="display: {% if form.instance.split_method == 'C' %}block{% else %}none{% endif %};">
+            <label for="id_custom_splits">Custom Splits:</label>
+            {{ form.custom_splits }}
+            {% if form.errors.custom_splits %}
+                <p style="color: red;">{{ form.errors.custom_splits }}</p>
+            {% endif %}
+        </div>
+        <input type="submit" />
+    </form>
+    <a href="{% url 'home' %}">Cancel</a>
+</body>
+</html>

@@ -1,13 +1,16 @@
 from django.shortcuts import render,HttpResponse,redirect,get_object_or_404
 from django.contrib.auth.models import User
-from .models import Group
+from .models import Group,Expense,ExpenseSplit
+from .forms import ExpenseForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .models import Friendship
 # Create your views here.
 @login_required(login_url='login')
 def HomePage(request):
-    return render (request,'home.html')
+    groups = request.user.group_members.all()
+    print(groups)
+    return render (request,'home.html',{'groups': groups})
 
 def SignupPage(request):
     if request.method=='POST':
@@ -17,15 +20,14 @@ def SignupPage(request):
         pass2=request.POST.get('password2')
 
         if pass1!=pass2:
-            return HttpResponse("Your password and confrom password are not Same!!")
+            return HttpResponse("Password mismatch!!!")
         else:
 
             my_user=User.objects.create_user(uname,email,pass1)
             my_user.save()
             return redirect('login')
-
-
     return render (request,'signup.html')
+
 
 def LoginPage(request):
     if request.method=='POST':
@@ -43,12 +45,11 @@ def LoginPage(request):
 @login_required
 def create_group(request):
     groups = request.user.group_members.all()
-    print(request.user.id)
     friends = request.user.friends2.all()
     if request.method == 'POST':
         group_name = request.POST.get('name')
         friends = request.POST.getlist('friends')
-        existing_group = Group.objects.filter(name=group_name).first()
+        existing_group = Group.objects.filter(name=group_name).exists()
         if existing_group:
             return HttpResponse("Group with this name already exists!")
         group = Group.objects.create(name=group_name)
@@ -57,16 +58,16 @@ def create_group(request):
         return redirect('home')
     return render(request, 'create_group.html', {'friends': friends, 'groups':groups})
 
+
 @login_required
 def delete_group(request, group_id):
     group = get_object_or_404(Group, pk=group_id)
 
     if request.method == 'POST':
         group.delete()
-        return redirect('home')
+        return redirect('create_group')
 
     return render(request, 'delete_group.html', {'group': group})
-
 
 @login_required
 def edit_group(request, group_id):
@@ -83,12 +84,10 @@ def edit_group(request, group_id):
                 return HttpResponse("Group with this name already exists!")
             group.name = group_name
             group.save()
-
-        # Update group members
         new_members = request.POST.getlist('friends')
         new_members.append(request.user)
         group.members.set(new_members)
-        return redirect('home')
+        return redirect('create_group')
     return render(request, 'edit_group.html', {'group': group, 'friends': friends, 'group_members': group_members})
 
 
@@ -131,3 +130,76 @@ def friend_list(request):
 def LogoutPage(request):
     logout(request)
     return redirect('signup')
+
+@login_required
+def create_expense(request, group_id):
+    group = get_object_or_404(Group, id=group_id)
+    
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            expense = form.save(commit=False)
+            expense.group = group
+            expense.paid_by = request.user
+            expense.save()
+
+            users = group.members.all()
+            if expense.split_method == 'E':
+                amount_per_user = expense.amount_spent / users.count()
+                for user in users:
+                    ExpenseSplit.objects.create(expense=expense, user=user, amount=amount_per_user)
+            
+            elif expense.split_method == 'P':
+                percentages = request.POST.get('percentage_splits')
+                if percentages:
+                    percentage_list = list(map(float, percentages.split(',')))
+                    total_percentage = sum(percentage_list)
+                    
+                    if total_percentage != 100:
+                        form.add_error('percentage_splits', 'Total percentage must equal 100.')
+                    else:
+                        if len(users) != len(percentage_list):
+                            form.add_error('percentage_splits', 'Number of percentages must match number of users.')
+                        else:
+                            for user, percentage in zip(users, percentage_list):
+                                amount = (percentage / 100) * expense.amount_spent
+                                ExpenseSplit.objects.create(expense=expense, user=user, amount=amount)
+            
+            elif expense.split_method == 'C':
+                custom_splits = request.POST.get('custom_splits')
+                if custom_splits:
+                    split_list = list(map(float, custom_splits.split(',')))
+                    total_amount = sum(split_list)
+
+                    if total_amount != expense.amount_spent:
+                        form.add_error('custom_splits', 'Total custom amounts must equal the expense amount.')
+                    else:
+                        if len(users) != len(split_list):
+                            form.add_error('custom_splits', 'Number of custom amounts must match number of users.')
+                        else:
+                            for user, amount in zip(users, split_list):
+                                ExpenseSplit.objects.create(expense=expense, user=user, amount=amount)
+
+            return render(request, 'split_expense.html', {'group': group, 'amount':amount_per_user})
+    else:
+        form = ExpenseForm()
+
+    return render(request, 'create_expense.html', {'form': form, 'group': group})
+
+
+@login_required
+def split_expense(request):
+    groups = request.user.group_members.all()
+    friends = request.user.friends2.all()
+    if request.method == 'POST':
+        group_name = request.POST.get('name')
+        friends = request.POST.getlist('friends')
+        existing_group = Group.objects.filter(name=group_name).exists()
+        if existing_group:
+            return HttpResponse("Group with this name already exists!")
+        group = Group.objects.create(name=group_name)
+        group.members.add(*friends)
+        group.members.add(request.user)
+        return redirect('home')
+    return render(request, 'split_expense.html', {'friends': friends, 'groups':groups})
+
