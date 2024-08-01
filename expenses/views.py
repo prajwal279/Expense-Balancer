@@ -134,7 +134,6 @@ def LogoutPage(request):
 @login_required
 def create_expense(request, group_id):
     group = get_object_or_404(Group, id=group_id)
-    
     if request.method == 'POST':
         form = ExpenseForm(request.POST)
         if form.is_valid():
@@ -142,45 +141,18 @@ def create_expense(request, group_id):
             expense.group = group
             expense.paid_by = request.user
             expense.save()
+            context = {'group':group,'expense':expense}
 
             users = group.members.all()
             if expense.split_method == 'E':
+                
                 amount_per_user = expense.amount_spent / users.count()
+                context['amount']=amount_per_user
+                context['next']=True
+                context['form']=form
                 for user in users:
                     ExpenseSplit.objects.create(expense=expense, user=user, amount=amount_per_user)
-            
-            elif expense.split_method == 'P':
-                percentages = request.POST.get('percentage_splits')
-                if percentages:
-                    percentage_list = list(map(float, percentages.split(',')))
-                    total_percentage = sum(percentage_list)
-                    
-                    if total_percentage != 100:
-                        form.add_error('percentage_splits', 'Total percentage must equal 100.')
-                    else:
-                        if len(users) != len(percentage_list):
-                            form.add_error('percentage_splits', 'Number of percentages must match number of users.')
-                        else:
-                            for user, percentage in zip(users, percentage_list):
-                                amount = (percentage / 100) * expense.amount_spent
-                                ExpenseSplit.objects.create(expense=expense, user=user, amount=amount)
-            
-            elif expense.split_method == 'C':
-                custom_splits = request.POST.get('custom_splits')
-                if custom_splits:
-                    split_list = list(map(float, custom_splits.split(',')))
-                    total_amount = sum(split_list)
-
-                    if total_amount != expense.amount_spent:
-                        form.add_error('custom_splits', 'Total custom amounts must equal the expense amount.')
-                    else:
-                        if len(users) != len(split_list):
-                            form.add_error('custom_splits', 'Number of custom amounts must match number of users.')
-                        else:
-                            for user, amount in zip(users, split_list):
-                                ExpenseSplit.objects.create(expense=expense, user=user, amount=amount)
-
-            return render(request, 'split_expense.html', {'group': group, 'amount':amount_per_user})
+            return render(request, 'create_expense.html', context)
     else:
         form = ExpenseForm()
 
