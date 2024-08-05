@@ -56,8 +56,9 @@ def create_group(request):
         group.members.add(*friends)
         group.members.add(request.user)
         return redirect('home')
-    return render(request, 'create_group.html', {'friends': friends, 'groups':groups})
-
+    view_group_id = request.GET.get("view_group_id")
+    print(view_group_id)
+    return render(request, 'create_group.html', {'friends': friends, 'groups':groups,'view_group_id':view_group_id})
 
 @login_required
 def delete_group(request, group_id):
@@ -90,7 +91,6 @@ def edit_group(request, group_id):
         return redirect('create_group')
     return render(request, 'edit_group.html', {'group': group, 'friends': friends, 'group_members': group_members})
 
-
 @login_required
 def add_friend(request):
     if request.method == 'POST':
@@ -113,19 +113,12 @@ def add_friend(request):
 
 @login_required
 def friend_list(request):
-    # Retrieve all friendships where the current user is involved
-    friends = Friendship.objects.filter(user1=request.user) | Friendship.objects.filter(user2=request.user)
-    
-    # Collect all unique friend users
+    friends = Friendship.objects.filter(user1=request.user)
     friend_users = set()
     for friend in friends:
         if friend.user1 != request.user:
             friend_users.add(friend.user1)
-        if friend.user2 != request.user:
-            friend_users.add(friend.user2)
-
     return render(request, 'friend_list.html', {'friends': friend_users})
-
 
 def LogoutPage(request):
     logout(request)
@@ -142,16 +135,24 @@ def create_expense(request, group_id):
             expense.paid_by = request.user
             expense.save()
             context = {'group':group,'expense':expense}
-
             users = group.members.all()
+            
             if expense.split_method == 'E':
-                
+                context['equals'] = True
                 amount_per_user = expense.amount_spent / users.count()
                 context['amount']=amount_per_user
                 context['next']=True
                 context['form']=form
                 for user in users:
                     ExpenseSplit.objects.create(expense=expense, user=user, amount=amount_per_user)
+            elif expense.split_method == 'P':
+                context['percentage'] = True
+                context['next']=True
+                context['form']=form
+            elif expense.split_method == 'C':
+                context['custom'] = True
+                context['next']=True
+                context['form']=form
             return render(request, 'create_expense.html', context)
     else:
         form = ExpenseForm()

@@ -2,32 +2,43 @@
 <html>
 <head>
     <title>Create Expense</title>
-    <script>
-        function updateFields() {
-            var splitMethod = document.getElementById('id_split_method').value;
-            document.getElementById('equal_splits').style.display = splitMethod === 'E' ? 'block' : 'none';
-            document.getElementById('percentage_splits').style.display = splitMethod === 'P' ? 'block' : 'none';
-            document.getElementById('custom_splits').style.display = splitMethod === 'C' ? 'block' : 'none';
-        }
-
-        window.onload = function() {
-            updateFields(); 
-        }
-    </script>
 </head>
 <body>
     <h1>Create Expense for {{ group.name }}</h1>
     <form method="post">
         {% csrf_token %}
-        
         {{ form.as_p }}
-        
         <input type="submit" value="Submit" />
     </form>
-    
+    <hr>
     {% if next %}
     {% include 'split_expense.html'%}
     {% endif %}
     <a href="{% url 'home' %}">Cancel</a>
 </body>
 </html>
+{% comment %} function displayAmount() {
+            var totalAmount = parseFloat(document.getElementById('amount').value);
+            console.log(totalAmount)
+            if (isNaN(totalAmount) || totalAmount <= 0) {
+                alert("Please enter a valid total amount.");
+                return;
+            }
+            var total_amount=0;
+            var valid_value = true;
+            var inputs = document.querySelectorAll('.value');
+            inputs.forEach(function(input) {
+                var val = parseFloat(input.value);
+                var amountDisplay = input.nextElementSibling;
+                if (!isNaN(val) && val > 0) {
+                    total_amount += val;
+                } else {
+                    amountDisplay.textContent = "Invalid value";
+                    valid_value = false;
+                }
+            });
+            if (total_amount != totalAmount) {
+                alert("The sum of all values must be equal to Total amount.");
+                return;
+            }
+        } {% endcomment %}

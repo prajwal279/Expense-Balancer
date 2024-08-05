@@ -5,28 +5,50 @@
     <title>Create Group</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
 
     <script>
-        {% comment %} function calculateAmounts() {
-            var totalAmount = parseFloat(document.getElementById('total_amount').value);
-            if (isNaN(totalAmount) || totalAmount <= 0) {
-                alert("Please enter a valid total amount.");
-                return;
-            }
-            var percentageInputs = document.querySelectorAll('.percentage');
-            percentageInputs.forEach(function(input) {
-                var percentage = parseFloat(input.value);
-                var amountDisplay = input.nextElementSibling;
-                if (!isNaN(percentage) && percentage > 0) {
-                    var amount = (totalAmount * (percentage / 100)).toFixed(2);
-                    amountDisplay.textContent = "Amount to pay: Rs." + amount;
-                } else {
-                    amountDisplay.textContent = "Invalid percentage";
-                }
-            });
-        } {% endcomment %}
+        function calculateAmounts() {
+    var totalAmount = parseFloat(document.getElementById('total_amount').value);
+    
+    if (isNaN(totalAmount) || totalAmount <= 0) {
+        alert("Enter a valid total amount!!!!");
+        return;
+    }
+
+    var percentageInputs = document.querySelectorAll('.percentage');
+    var totalPercentage = 0;
+    var validPercentages = true;
+
+    percentageInputs.forEach(function(input) {
+        var percentage = parseFloat(input.value);
+        var amountDisplay = input.nextElementSibling;
+
+        if (!isNaN(percentage) && percentage > 0) {
+            totalPercentage += percentage;
+        } else {
+            amountDisplay.textContent = "Invalid percentage";
+            validPercentages = false;
+        }
+    });
+
+    if (totalPercentage !== 100) {
+        alert("The sum of all percentages must be equal to 100%.");
+        return;
+    }
+
+    percentageInputs.forEach(function(input) {
+        var percentage = parseFloat(input.value);
+        var amountDisplay = input.nextElementSibling;
+
+        if (!isNaN(percentage) && percentage > 0) {
+            var amount = (totalAmount * (percentage / 100)).toFixed(2);
+            amountDisplay.textContent = "Amount to pay: Rs." + amount;
+        }
+    });
+}
+
 
         function displayAmount() {
             var totalAmount = parseFloat(document.getElementById('total_amount').value);
@@ -35,8 +57,8 @@
                 alert("Please enter a valid total amount.");
                 return;
             }
-
-            var inputs = document.querySelectorAll('.percentage_input');
+            
+            var inputs = document.querySelectorAll('.value');
             inputs.forEach(function(input) {
                 var val = parseFloat(input.value);
                 var amountDisplay = input.nextElementSibling;
@@ -44,7 +66,7 @@
                     var amount = val.toFixed(2);
                     amountDisplay.textContent = "Amount to pay: Rs." + amount;
                 } else {
-                    amountDisplay.textContent = "Invalid val";
+                    amountDisplay.textContent = "Invalid value";
                 }
             });
         }
@@ -53,6 +75,7 @@
 
 </head>
 <body>
+    {% if custom %}
     <form method="post">
         {% csrf_token %}
         <ul>
@@ -65,7 +88,7 @@
                             <input 
                                 type="text" 
                                 id="total_amount"
-                                class="percentage_input"
+                                class="value"
                                 placeholder="Enter amount"
                             />
                             <span class="amount_display"></span>
@@ -85,8 +108,10 @@
     </form>    
 </body>
 </html>
+{% endif %}
 
-{% comment %} <form method="post">
+{% if equals %}
+<form method="post">
     {% csrf_token %}
     <ul>
         <li>
@@ -104,10 +129,11 @@
         </li>
     </ul>
     <button type="submit">Request to pay</button>
-</form> {% endcomment %}
+</form>
+{% endif %}
 
-
-{% comment %} <form method="post">
+{% if percentage %}
+<form method="post">
         {% csrf_token %}
         <ul>
             <li>
@@ -136,4 +162,5 @@
         />
         <button type="button" onclick="calculateAmounts()">Calculate Amounts</button>
         <button type="submit">Request to pay</button>
-    </form>     {% endcomment %}
+    </form>
+{% endif %}
