@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <script>
-        function calculateAmounts() {
+        {% comment %} function calculateAmounts() {
             var totalAmount = parseFloat(document.getElementById('total_amount').value);
             if (isNaN(totalAmount) || totalAmount <= 0) {
                 alert("Please enter a valid total amount.");
@@ -26,12 +26,88 @@
                     amountDisplay.textContent = "Invalid percentage";
                 }
             });
+        } {% endcomment %}
+
+        function displayAmount() {
+            var totalAmount = parseFloat(document.getElementById('total_amount').value);
+    
+            if (isNaN(totalAmount) || totalAmount <= 0) {
+                alert("Please enter a valid total amount.");
+                return;
+            }
+
+            var inputs = document.querySelectorAll('.percentage_input');
+            inputs.forEach(function(input) {
+                var val = parseFloat(input.value);
+                var amountDisplay = input.nextElementSibling;
+                if (!isNaN(val) && val > 0) {
+                    var amount = val.toFixed(2);
+                    amountDisplay.textContent = "Amount to pay: Rs." + amount;
+                } else {
+                    amountDisplay.textContent = "Invalid val";
+                }
+            });
         }
+        
     </script>
 
 </head>
 <body>
     <form method="post">
+        {% csrf_token %}
+        <ul>
+            <li>
+                <strong>{{ group.name }}</strong>
+                <ul>
+                    {% for member in group.members.all %}
+                        <li>
+                            {{ member.username }}
+                            <input 
+                                type="text" 
+                                id="total_amount"
+                                class="percentage_input"
+                                placeholder="Enter amount"
+                            />
+                            <span class="amount_display"></span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+        <label for="total_amount">Total Amount:</label>
+        <input 
+            type="text" 
+             
+            placeholder="Enter total amount" 
+        />
+        <button type="button" onclick="displayAmount()">Calculate Amounts</button>
+        <button type="submit">Request to pay</button>
+    </form>    
+</body>
+</html>
+
+{% comment %} <form method="post">
+    {% csrf_token %}
+    <ul>
+        <li>
+            <strong>{{ group.name }}</strong>
+            <ul>
+                {% for member in group.members.all %}
+                    <span>
+                        <li>{{ member.username }}</li>
+                    </span>
+                    <span>
+                        {{amount}}
+                    </span>
+                {% endfor %}
+            </ul>
+        </li>
+    </ul>
+    <button type="submit">Request to pay</button>
+</form> {% endcomment %}
+
+
+{% comment %} <form method="post">
         {% csrf_token %}
         <ul>
             <li>
@@ -60,26 +136,4 @@
         />
         <button type="button" onclick="calculateAmounts()">Calculate Amounts</button>
         <button type="submit">Request to pay</button>
-    </form>    
-</body>
-</html>
-
-{% comment %} <form method="post">
-    {% csrf_token %}
-    <ul>
-        <li>
-            <strong>{{ group.name }}</strong>
-            <ul>
-                {% for member in group.members.all %}
-                    <span>
-                        <li>{{ member.username }}</li>
-                    </span>
-                    <span>
-                        {{amount}}
-                    </span>
-                {% endfor %}
-            </ul>
-        </li>
-    </ul>
-    <button type="submit">Request to pay</button>
-</form> {% endcomment %}
+    </form>     {% endcomment %}
