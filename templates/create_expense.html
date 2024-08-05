@@ -17,28 +17,3 @@
     <a href="{% url 'home' %}">Cancel</a>
 </body>
 </html>
-{% comment %} function displayAmount() {
-            var totalAmount = parseFloat(document.getElementById('amount').value);
-            console.log(totalAmount)
-            if (isNaN(totalAmount) || totalAmount <= 0) {
-                alert("Please enter a valid total amount.");
-                return;
-            }
-            var total_amount=0;
-            var valid_value = true;
-            var inputs = document.querySelectorAll('.value');
-            inputs.forEach(function(input) {
-                var val = parseFloat(input.value);
-                var amountDisplay = input.nextElementSibling;
-                if (!isNaN(val) && val > 0) {
-                    total_amount += val;
-                } else {
-                    amountDisplay.textContent = "Invalid value";
-                    valid_value = false;
-                }
-            });
-            if (total_amount != totalAmount) {
-                alert("The sum of all values must be equal to Total amount.");
-                return;
-            }
-        } {% endcomment %}
