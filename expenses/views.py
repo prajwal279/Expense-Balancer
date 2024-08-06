@@ -5,12 +5,22 @@ from .forms import ExpenseForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .models import Friendship
-# Create your views here.
+
 @login_required(login_url='login')
 def HomePage(request):
     groups = request.user.group_members.all()
-    print(groups)
-    return render (request,'home.html',{'groups': groups})
+    #print(groups)
+    context = {}
+    # if request.method == 'POST':
+    #     groups = request.user.group_members.all()
+    context['groups'] = groups
+    # view_group_id = request.GET.get("view_group_id")
+    # context['view_group_id'] = view_group_id
+    # print(view_group_id)
+    view_group_id = request.GET.get("group_id")
+    context['view_group_id'] = view_group_id
+    return render (request,'home.html',context)
+
 
 def SignupPage(request):
     if request.method=='POST':
@@ -43,7 +53,7 @@ def LoginPage(request):
     return render (request,'login.html')
 
 @login_required
-def create_group(request):
+def create_group(request)   :
     groups = request.user.group_members.all()
     friends = request.user.friends2.all()
     if request.method == 'POST':
@@ -57,7 +67,6 @@ def create_group(request):
         group.members.add(request.user)
         return redirect('home')
     view_group_id = request.GET.get("view_group_id")
-    print(view_group_id)
     return render(request, 'create_group.html', {'friends': friends, 'groups':groups,'view_group_id':view_group_id})
 
 @login_required
@@ -94,7 +103,10 @@ def edit_group(request, group_id):
 @login_required
 def add_friend(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        username = request.POST.get('friend_username')
+        if not username:
+            username = request.POST.get('username')
+        print(request.POST)
         friend = get_object_or_404(User, username=username)
 
         if request.user != friend:
@@ -113,7 +125,7 @@ def add_friend(request):
 
 @login_required
 def friend_list(request):
-    friends = Friendship.objects.filter(user1=request.user)
+    friends = Friendship.objects.filter(user2=request.user)
     friend_users = set()
     for friend in friends:
         if friend.user1 != request.user:
@@ -175,4 +187,6 @@ def split_expense(request):
         group.members.add(request.user)
         return redirect('home')
     return render(request, 'split_expense.html', {'friends': friends, 'groups':groups})
+
+
 
