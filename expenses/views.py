@@ -9,14 +9,8 @@ from .models import Friendship
 @login_required(login_url='login')
 def HomePage(request):
     groups = request.user.group_members.all()
-    #print(groups)
     context = {}
-    # if request.method == 'POST':
-    #     groups = request.user.group_members.all()
     context['groups'] = groups
-    # view_group_id = request.GET.get("view_group_id")
-    # context['view_group_id'] = view_group_id
-    # print(view_group_id)
     view_group_id = request.GET.get("group_id")
     context['view_group_id'] = view_group_id
     return render (request,'home.html',context)

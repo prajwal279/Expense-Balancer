@@ -2,81 +2,58 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Create Group</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-
+    <title>Create Group Expense</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
-
     <script>
         function calculateAmounts() {
-    var totalAmount = parseFloat(document.getElementById('total_amount').value);
-    
-    if (isNaN(totalAmount) || totalAmount <= 0) {
-        alert("Enter a valid total amount!!!!");
-        return;
-    }
-
-    var percentageInputs = document.querySelectorAll('.percentage');
-    var totalPercentage = 0;
-    var validPercentages = true;
-
-    percentageInputs.forEach(function(input) {
-        var percentage = parseFloat(input.value);
-        var amountDisplay = input.nextElementSibling;
-
-        if (!isNaN(percentage) && percentage > 0) {
-            totalPercentage += percentage;
-        } else {
-            amountDisplay.textContent = "Invalid percentage";
-            validPercentages = false;
-        }
-    });
-
-    if (totalPercentage !== 100) {
-        alert("The sum of all percentages must be equal to 100%.");
-        return;
-    }
-
-    percentageInputs.forEach(function(input) {
-        var percentage = parseFloat(input.value);
-        var amountDisplay = input.nextElementSibling;
-
-        if (!isNaN(percentage) && percentage > 0) {
-            var amount = (totalAmount * (percentage / 100)).toFixed(2);
-            amountDisplay.textContent = "Amount to pay: Rs." + amount;
-        }
-    });
-}
-
-
-        {% comment %} function displayAmount() {
-            var totalAmount = parseFloat(document.getElementById('amount').value);
-    
+            var totalAmount = parseFloat(document.getElementById('total_amount').value);
+            
             if (isNaN(totalAmount) || totalAmount <= 0) {
-                alert("Please enter a valid total amount.");
+                alert("Enter a valid total amount!");
                 return;
             }
-            
-            var inputs = document.querySelectorAll('.value');
-            inputs.forEach(function(input) {
-                var val = parseFloat(input.value);
+
+            var percentageInputs = document.querySelectorAll('.percentage');
+            var totalPercentage = 0;
+            var validPercentages = true;
+
+            percentageInputs.forEach(function(input) {
+                var percentage = parseFloat(input.value);
                 var amountDisplay = input.nextElementSibling;
-                if (!isNaN(val) && val > 0) {
-                    var amount = val.toFixed(2);
-                    amountDisplay.textContent = "Amount to pay: Rs." + amount;
+
+                if (!isNaN(percentage) && percentage > 0) {
+                    totalPercentage += percentage;
                 } else {
-                    amountDisplay.textContent = "Invalid value";
+                    amountDisplay.textContent = "Invalid percentage";
+                    validPercentages = false;
                 }
             });
-        } {% endcomment %}
+
+            if (totalPercentage !== 100) {
+                alert("The sum of all percentages must be equal to 100%.");
+                return;
+            }
+
+            percentageInputs.forEach(function(input) {
+                var percentage = parseFloat(input.value);
+                var amountDisplay = input.nextElementSibling;
+
+                if (!isNaN(percentage) && percentage > 0) {
+                    var amount = (totalAmount * (percentage / 100)).toFixed(2);
+                    amountDisplay.textContent = "Amount to pay: Rs." + amount;
+                }
+            });
+        }
+
         function displayAmount() {
             var totalAmount = parseFloat(document.getElementById('amount').value);
             if (isNaN(totalAmount) || totalAmount <= 0) {
                 alert("Please enter a valid total amount.");
                 return;
             }
-            var total_amount=0;
+
+            var total_amount = 0;
             var valid_value = true;
             var inputs = document.querySelectorAll('.value');
             inputs.forEach(function(input) {
@@ -90,132 +67,112 @@
                     valid_value = false;
                 }
             });
-            console.log(totalAmount, total_amount)
-            if (total_amount != totalAmount) {
-                alert("The sum of all values must be equal to Total amount.");
+
+            if (total_amount !== totalAmount) {
+                alert("The sum of all values must be equal to the total amount.");
                 return;
             }
         }
-        
     </script>
-
 </head>
-
-
 <body>
-    {% if custom %}
-    <form method="post">
-        {% csrf_token %}
-        <ul>
-            <li>
-                <strong>{{ group.name }}</strong>
-                <ul>
-                    {% for member in group.members.all %}
-                        <li>
-                            {{ member.username }}
-                            <input 
-                                type="text" 
-                                id="total_amount"
-                                class="value"
-                                placeholder="Enter amount"
-                            />
-                            <span class="amount_display"></span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        </ul>
-        <label for="total_amount">Total Amount:</label>
-        <input 
-            type="text" 
-            id='amount'
-            placeholder="Enter total amount" 
-        />
-        <button type="button" onclick="displayAmount()">Calculate Amounts</button>
-        <button type="submit">Request to pay</button>
-    </form>    
+    <div class="container my-4">
+        {% if custom %}
+        <div class="card">
+            <div class="card-header">
+                <h2>Create Expense for {{ group.name }}</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <ul class="list-group">
+                        {% for member in group.members.all %}
+                            <li class="list-group-item">
+                                {{ member.username }}
+                                <input 
+                                    type="text" 
+                                    id="total_amount"
+                                    class="form-control mt-2"
+                                    placeholder="Enter amount"
+                                />
+                                <span class="amount_display d-block mt-2"></span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="form-group mt-3">
+                        <label for="amount">Total Amount:</label>
+                        <input 
+                            type="text" 
+                            id='amount'
+                            class="form-control"
+                            placeholder="Enter total amount" 
+                        />
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="displayAmount()">Calculate Amounts</button>
+                    <button type="submit" class="btn btn-success">back</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if equals %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2>Expense Breakdown for {{ group.name }}</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <ul class="list-group">
+                        {% for member in group.members.all %}
+                            <li class="list-group-item">
+                                {{ member.username }}: {{ amount }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button type="submit" class="btn btn-success mt-3">back</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if percentage %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2>Calculate Amounts by Percentage for {{ group.name }}</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <ul class="list-group">
+                        {% for member in group.members.all %}
+                            <li class="list-group-item">
+                                {{ member.username }}
+                                <input 
+                                    type="text" 
+                                    class="percentage form-control mt-2" 
+                                    name="percentage_{{ member.id }}" 
+                                    placeholder="Enter percentage"
+                                />
+                                <span class="d-block mt-2"></span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="form-group mt-3">
+                        <label for="total_amount">Total Amount:</label>
+                        <input 
+                            type="text" 
+                            id="total_amount" 
+                            class="form-control"
+                            placeholder="Enter total amount" 
+                        />
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="calculateAmounts()">Calculate Amounts</button>
+                    <button type="submit" class="btn btn-success">Request to pay</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
-{% endif %}
-
-{% if equals %}
-<form method="post">
-    {% csrf_token %}
-    <ul>
-        <li>
-            <strong>{{ group.name }}</strong>
-            <ul>
-                {% for member in group.members.all %}
-                    <span>
-                        <li>{{ member.username }}</li>
-                    </span>
-                    <span>
-                        {{amount}}
-                    </span>
-                {% endfor %}
-            </ul>
-        </li>
-    </ul>
-    <button type="submit">Request to pay</button>
-</form>
-{% endif %}
-
-{% if percentage %}
-
-<form method="post">
-        {% csrf_token %}
-        <ul>
-            <li>
-                <strong>{{ group.name }}</strong>
-                <ul>
-                    {% for member in group.members.all %}
-                        <li>
-                            {{ member.username }}
-                            <input 
-                                type="text" 
-                                class="percentage" 
-                                name="percentage_{{ member.id }}" 
-                                placeholder="Enter percentage"
-                            />
-                            <span></span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </li>
-        </ul>
-        <label for="total_amount">Total Amount:</label>
-        <input 
-            type="text" 
-            id="total_amount" 
-            placeholder="Enter total amount" 
-        />
-        <button type="button" onclick="calculateAmounts()">Calculate Amounts</button>
-        <button type="submit">Request to pay</button>
-    </form>
-{% endif %}
-
-{% comment %} function displayAmount() {
-            var totalAmount = parseFloat(document.getElementById('amount').value);
-            console.log(totalAmount)
-            if (isNaN(totalAmount) || totalAmount <= 0) {
-                alert("Please enter a valid total amount.");
-                return;
-            }
-            var total_amount=0;
-            var valid_value = true;
-            var inputs = document.querySelectorAll('.value');
-            inputs.forEach(function(input) {
-                var val = parseFloat(input.value);
-                var amountDisplay = input.nextElementSibling;
-                if (!isNaN(val) && val > 0) {
-                    total_amount += val;
-                } else {
-                    amountDisplay.textContent = "Invalid value";
-                    valid_value = false;
-                }
-            });
-            if (total_amount != totalAmount) {
-                alert("The sum of all values must be equal to Total amount.");
-                return;
-            }
-        } {% endcomment %}
