@@ -63,7 +63,7 @@ def create_group(request)   :
     view_group_id = request.GET.get("view_group_id")
     return render(request, 'create_group.html', {'friends': friends, 'groups':groups,'view_group_id':view_group_id})
 
-@login_required
+@login_required 
 def delete_group(request, group_id):
     group = get_object_or_404(Group, pk=group_id)
 
@@ -100,7 +100,6 @@ def add_friend(request):
         username = request.POST.get('friend_username')
         if not username:
             username = request.POST.get('username')
-        print(request.POST)
         friend = get_object_or_404(User, username=username)
 
         if request.user != friend:
@@ -109,14 +108,12 @@ def add_friend(request):
             if not friendship_exists:
                 Friendship.objects.create(user1=request.user, user2=friend)
                 Friendship.objects.create(user1=friend, user2=request.user)
-
         return redirect('friend_list')
     
     friends = request.user.friends1.all()  
-    print(friends)
-
+   
     return render(request, 'add_friends.html', {'friends': friends})
-
+     
 @login_required
 def friend_list(request):
     friends = Friendship.objects.filter(user2=request.user)
@@ -128,7 +125,7 @@ def friend_list(request):
 
 def LogoutPage(request):
     logout(request)
-    return redirect('signup')
+    return redirect('login')
 
 @login_required
 def create_expense(request, group_id):

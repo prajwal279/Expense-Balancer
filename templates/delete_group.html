@@ -8,6 +8,7 @@
     <style>
         body {
             background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
         }
         .container {
             margin-top: 50px;
@@ -16,6 +17,28 @@
             padding: 20px;
             border: 1px solid #e0e0e0;
             border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card-title {
+            color: #dc3545; /* Red color for emphasis */
+            margin-bottom: 20px;
+        }
+        .card-text {
+            margin-bottom: 20px;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border: none;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
         }
     </style>
 </head>
@@ -24,7 +47,7 @@
         <div class="card">
             <h2 class="card-title">Delete Group</h2>
             <div class="card-body">
-                <p class="card-text">Are you sure you want to delete the group "{{ group.name }}"?</p>
+                <p class="card-text">Are you sure you want to delete the group "<strong>{{ group.name }}</strong>"?</p>
                 <form method="post">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-danger">Delete</button>

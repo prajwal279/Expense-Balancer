@@ -18,6 +18,9 @@
     </style>
 </head>
 <body>
+    {% block navbar %}
+        {% include "nav.html" %}
+    {% endblock navbar %}
     <div class="container">
         <div class="card mb-4">
             <div class="card-header">
@@ -34,7 +37,6 @@
                         <li class="list-group-item">No friends yet.</li>
                     {% endif %}
                 </ul>
-
                 <h3>Add New Friend:</h3>
                 <form action="{% url 'add_friend' %}" method="post">
                     {% csrf_token %}
