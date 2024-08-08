@@ -124,6 +124,7 @@
                                         type="text" 
                                         id="total_amount"
                                         class="form-control"
+                                        name="percentage_{{ member.id }}" 
                                         placeholder="Enter amount"
                                     />
                                     <div class="input-group-append">
@@ -138,12 +139,13 @@
                         <input 
                             type="text" 
                             id='amount'
-                            
                             placeholder="Enter total amount" 
                         />
+                        <input type="hidden" name="c_flag" value="c" />
+                        <input type="hidden" name="expense_id" value="{{expense.id}}" />
                     </div>
                     <button type="button" class="btn btn-primary" onclick="displayAmount()">Calculate Amounts</button>
-                    <button type="submit" class="btn btn-success">Back</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
                 </form>
             </div>
         </div>
@@ -204,9 +206,11 @@
                             class="form-control"
                             placeholder="Enter total amount" 
                         />
+                        <input type="hidden" name="p_flag" value="P" />
+                        <input type="hidden" name="expense_id" value="{{expense.id}}" />
                     </div>
                     <button type="button" class="btn btn-primary" onclick="calculateAmounts()">Calculate Amounts</button>
-                    <button type="submit" class="btn btn-success">Request to Pay</button>
+                    <button type="submit" class="btn btn-success">Submit</button>
                 </form>
             </div>
         </div>
