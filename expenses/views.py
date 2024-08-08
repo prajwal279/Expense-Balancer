@@ -47,7 +47,7 @@ def LoginPage(request):
     return render (request,'login.html')
 
 @login_required
-def create_group(request)   :
+def create_group(request):
     groups = request.user.group_members.all()
     friends = request.user.friends2.all()
     if request.method == 'POST':
@@ -63,23 +63,37 @@ def create_group(request)   :
     view_group_id = request.GET.get("view_group_id")
     return render(request, 'create_group.html', {'friends': friends, 'groups':groups,'view_group_id':view_group_id})
 
-@login_required 
-def delete_group(request, group_id):
-    group = get_object_or_404(Group, pk=group_id)
+@login_required
+def view_group(request):
+    groups = request.user.group_members.all()
+    friends = request.user.friends2.all()
+    if request.method == 'POST':
+        group_name = request.POST.get('name')
+        friends = request.POST.getlist('friends')
+        existing_group = Group.objects.filter(name=group_name).exists()
+        if existing_group:
+            return HttpResponse("Group name already exists!")
+        group = Group.objects.create(name=group_name)
+        group.members.add(*friends)
+        group.members.add(request.user)
+        return redirect('home')
+    view_group_id = request.GET.get("view_group_id")
+    return render(request, 'view_group.html', {'friends': friends, 'groups':groups,'view_group_id':view_group_id})
 
+
+@login_required 
+def delete_group(request,group_id):
+    group = get_object_or_404(Group, pk=group_id)
     if request.method == 'POST':
         group.delete()
         return redirect('create_group')
-
     return render(request, 'delete_group.html', {'group': group})
 
 @login_required
 def edit_group(request, group_id):
     group = get_object_or_404(Group, pk=group_id)
-
     friends = request.user.friends2.all()  
     group_members = group.members.all()    
-
     if request.method == 'POST':
         group_name = request.POST.get('name')
         if group_name != group.name:
@@ -97,9 +111,7 @@ def edit_group(request, group_id):
 @login_required
 def add_friend(request):
     if request.method == 'POST':
-        username = request.POST.get('friend_username')
-        if not username:
-            username = request.POST.get('username')
+        username = request.POST.get('username')
         friend = get_object_or_404(User, username=username)
 
         if request.user != friend:
@@ -139,7 +151,6 @@ def create_expense(request, group_id):
             expense.save()
             context = {'group':group,'expense':expense}
             users = group.members.all()
-            
             if expense.split_method == 'E':
                 context['equals'] = True
                 amount_per_user = expense.amount_spent / users.count()
@@ -162,22 +173,21 @@ def create_expense(request, group_id):
 
     return render(request, 'create_expense.html', {'form': form, 'group': group})
 
-
 @login_required
 def split_expense(request):
     groups = request.user.group_members.all()
     friends = request.user.friends2.all()
     if request.method == 'POST':
-        group_name = request.POST.get('name')
-        friends = request.POST.getlist('friends')
-        existing_group = Group.objects.filter(name=group_name).exists()
-        if existing_group:
-            return HttpResponse("Group with this name already exists!")
-        group = Group.objects.create(name=group_name)
-        group.members.add(*friends)
-        group.members.add(request.user)
-        return redirect('home')
+        print(request.POST)
     return render(request, 'split_expense.html', {'friends': friends, 'groups':groups})
 
 
+
+def show_expense(request):
+    splits = ExpenseSplit.objects.filter(user=request.user)
+    for split in splits:
+        print(split.amount)
+        print(split.expense.description)
+        print(split.expense.group.name)
+    return render(request, 'equal_expense.html', {'splits':splits})
 

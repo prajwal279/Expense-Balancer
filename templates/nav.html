@@ -3,6 +3,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
     <title>Home Page</title>
@@ -18,13 +22,6 @@
         }
         .nav-link {
             font-size: 1.1em; 
-        }
-        .navbar-brand img {
-            border: 2px solid #fff;
-        }
-        .btn-outline-light {
-            border-radius: 20px; 
-            padding: 5px 15px;
         }
     </style>
 </head>
@@ -43,8 +40,17 @@
                     <a class="nav-link" href="{% url 'add_friend' %}">Add Friend</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'friend_list' %}">Friend List</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'create_group' %}">Create Group</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'view_group' %}">View Group</a>
+                </li> 
+               <li class="nav-item">
+                    <a class="nav-link" href="{% url 'show_expense' %}">View Expense</a>
+                </li> 
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item">

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Equal Expenses for {{ group.name }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container my-4">
+        <div class="card">
+            <div class="card-header">
+                <h2>Equal Expenses for {{ request.user }}</h2>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for split in splits %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Rs. {{ split.amount }} {{split.expense.description}} {{split.expense.group.name}} {{split.expense.split_method}}
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% comment %} <a href="{% url 'expense_list' %}" class="btn btn-primary mt-3">Back to Expense List</a> {% endcomment %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

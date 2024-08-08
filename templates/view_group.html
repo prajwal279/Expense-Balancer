@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">   
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groups List</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 22px;
+            color: #007bff;
+        }
+        .button-group {
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #007bff;
+            border: none;
+            color: #ffffff;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            margin-right: 15px;
+            font-size: 14px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .group-details {
+            margin-top: 10px;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            padding-left: 20px;
+            background-color: #f8f9fa;
+        }
+        .group-details ul {
+            padding-left: 20px;
+        }
+        .group-details li {
+            margin: 5px 0;
+        }
+        @media (max-width: 600px) {
+            .button-group {
+                display: flex;
+                flex-direction: column;
+            }
+            .button-group a {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% block navbar %}
+    {% include "nav.html" %}
+    {% endblock navbar %}
+    <h2 style="background-color: lightgray;">Group List</h2>
+    <ul>
+        {% for group in groups %}
+            <li>
+                <strong>{{ group.name }}</strong>
+                <div class="button-group">
+                    <a href="?view_group_id={{ group.id }}" title="View Group">
+                        <button>View</button>
+                    </a>
+                    <a href="{% url 'delete_group' group.id %}">Delete Group</a>
+                    <a href="{% url 'edit_group' group.id %}">Edit Group</a>
+                    <a href="{% url 'create_expense' group.id %}">Split an Expense</a>
+                    {% comment %} <a href="{% url 'view_expense' group.id 'equal' %}" class="btn btn-primary mt-3">View Equal Expenses</a> {% endcomment %}
+
+                </div>
+                {% if view_group_id == group.id|stringformat:"s" %}
+                <div class="group-details">
+                    <ul>
+                        {% for friend in group.members.all %}
+                            <li>{{ friend }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
