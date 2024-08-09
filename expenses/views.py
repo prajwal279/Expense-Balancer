@@ -214,9 +214,9 @@ def split_expense(request):
 
 def show_expense(request):
     splits = ExpenseSplit.objects.filter(user=request.user)
-    for split in splits:
-        print(split.amount)
-        print(split.expense.description)
-        print(split.expense.group.name)
+    # for split in splits:
+    #     print(split.expense.group.name)
+    #     print(split.expense.description)
+    #     print(split.amount)
     return render(request, 'equal_expense.html', {'splits':splits})
 

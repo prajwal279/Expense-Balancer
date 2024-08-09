@@ -1,3 +1,4 @@
+\{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,50 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css">
     <title>Home Page</title>
-  </head>
+    <style>
+        .members-list {
+            display: none;
+            list-style-type: none;
+            padding: 0;
+        }
+        .members-list.show {
+            display: block;
+        }
+        .bg-image {
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+    <script>
+        function toggleMembers(groupId) {
+            const membersList = document.getElementById('members-list-' + groupId);
+            if (membersList) {
+                membersList.classList.toggle('show');
+            }
+        }
+    </script>
+</head>
 <body>
   {% block navbar %}
     {% include "nav.html" %}
   {% endblock navbar %}
+  
+  <img class="bg-image" src="{% static 'images/bg.jpg' %}" alt="Brand">
+  
+  <div class="container mt-4">
+      <h1 class="mb-4">Split Expense</h1>
+      
+      {% if groups %}
+          <div class="mt-4">
+              <h2>Groups:</h2>
+              <ul class="list-group">
+                  {% for group in groups %}
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                          {{ group.name }}
+                          <button class="btn btn-info btn-sm" onclick="toggleMembers('{{ group.id }}')">Show Members</button>
+                          <ul id="members-list-{{ group.id }}" class="members-list">
+                              {% for friend in group.members.all %}
+                                  <li class="list-group-item">{{ friend }}</li>
+                              {% endfor %}
+                          </ul>
+                      </li>
+                  {% endfor %}
+              </ul>
+          </div>
+      {% endif %}
 
-    <div class="container mt-4">
-        <h1 class="mb-4">Split Expense</h1>
-        {% if groups %}
-            <div class="mt-4">
-                <h2>Groups:</h2>
-                <ul class="list-group">
-                    {% for group in groups %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ group.name }}
-                            <form class="ml-2">
-                                <input type="hidden" name="group_id" value="{{ group.id }}">
-                                <a href="?view_group_id={{ group.id }}">
-                                  <button type="submit" class="btn btn-info btn-sm" onclick="toggleMembers()">Show Members</button>
-                                </a>
-                                {% if view_group_id == group.id|stringformat:"s" %}
-                                <ul id="members-list" >
-                                    {% for friend in group.members.all %}
-                                        <li>{{ friend }}</li>
-                                    {% endfor %}
-                                </ul>
-                                {% endif %}
-                              </form>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% if members %}
-            <div class="mt-4">
-                <h2>Members of {{ group.name }}:</h2>
-                <ul class="list-group">
-                    {% for member in members %}
-                        <li class="list-group-item">{{ member.name }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-    </div>
-  </body>
+      {% if members %}
+          <div class="mt-4">
+              <h2>Members of {{ group.name }}:</h2>
+              <ul class="list-group">
+                  {% for member in members %}
+                      <li class="list-group-item">{{ member.name }}</li>
+                  {% endfor %}
+              </ul>
+          </div>
+      {% endif %}
+  </div>
+</body>
 </html>

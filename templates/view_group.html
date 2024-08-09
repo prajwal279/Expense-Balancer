@@ -103,8 +103,6 @@
                     <a href="{% url 'delete_group' group.id %}">Delete Group</a>
                     <a href="{% url 'edit_group' group.id %}">Edit Group</a>
                     <a href="{% url 'create_expense' group.id %}">Split an Expense</a>
-                    {% comment %} <a href="{% url 'view_expense' group.id 'equal' %}" class="btn btn-primary mt-3">View Equal Expenses</a> {% endcomment %}
-
                 </div>
                 {% if view_group_id == group.id|stringformat:"s" %}
                 <div class="group-details">
