@@ -66,26 +66,5 @@
         </ul>
         <button type="submit" class="btn btn-success">Create Group</button>
     </form>
-    {% comment %} <hr>
-    <ul>
-        {% for group in groups %}
-            <li>
-                <strong>{{ group.name }}</strong> 
-                <a href="?view_group_id={{ group.id }}" title="View Group" style="font-size: 25px; text-decoration:none"><button class="btn btn-info">View</button></a> 
-                <a href="{% url 'delete_group' group.id %}" class="btn btn-danger">Delete Group</a>
-                <a href="{% url 'edit_group' group.id %}" class="btn btn-warning">Edit Group</a>
-                <a href="{% url 'create_expense' group.id %}" class="btn btn-primary">Split an Expense</a>
-                {% if view_group_id == group.id|stringformat:"s" %}
-                <div class="group-details">
-                    <ul>
-                        {% for friend in group.members.all %}
-                            <li>{{ friend }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul> {% endcomment %}
 </body>
 </html>

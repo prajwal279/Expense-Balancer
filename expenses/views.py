@@ -154,12 +154,12 @@ def create_expense(request, group_id):
             users = group.members.all()
             if expense.split_method == 'E':
                 context['equals'] = True
-                amount_per_user = expense.amount_spent / users.count()
-                context['amount']=amount_per_user
+                T_amount = expense.amount_spent / users.count()
+                context['amount']=T_amount
                 context['next']=True
                 context['form']=form
                 for user in users:
-                    ExpenseSplit.objects.create(expense=expense, user=user, amount=amount_per_user)
+                    ExpenseSplit.objects.create(expense=expense, user=user, amount=T_amount)
             elif expense.split_method == 'P':
                 context['percentage'] = True
                 context['next']=True
@@ -172,10 +172,9 @@ def create_expense(request, group_id):
             return render(request, 'create_expense.html', context)
         if request.POST.get('expense_id') and request.POST.get('p_flag'):
             expense = Expense.objects.get(id=request.POST.get('expense_id'))
-            data = request.POST.copy()
             form = ExpenseForm()
             context['form']=form
-            for key, value in data.items():
+            for key, value in request.POST.items():
                 split = ExpenseSplit()
                 if "percentage" in key:
                     user_id = int(key[11:])
@@ -186,10 +185,9 @@ def create_expense(request, group_id):
                     split.save()
         if request.POST.get('expense_id') and request.POST.get('c_flag'):
             expense = Expense.objects.get(id=request.POST.get('expense_id'))
-            data = request.POST.copy()
             form = ExpenseForm()
             context['form']=form
-            for key, value in data.items():
+            for key, value in request.POST.items():
                 split = ExpenseSplit()
                 if "percentage" in key:
                     user_id = int(key[11:])
@@ -200,23 +198,17 @@ def create_expense(request, group_id):
                     split.save()
     else:
         form = ExpenseForm()
-
     return render(request, 'create_expense.html', {'form': form, 'group': group})
 
 @login_required
 def split_expense(request):
     groups = request.user.group_members.all()
     friends = request.user.friends2.all()
-
     return render(request, 'split_expense.html', {'friends': friends, 'groups':groups})
 
 
 
 def show_expense(request):
     splits = ExpenseSplit.objects.filter(user=request.user)
-    # for split in splits:
-    #     print(split.expense.group.name)
-    #     print(split.expense.description)
-    #     print(split.amount)
     return render(request, 'equal_expense.html', {'splits':splits})
 
