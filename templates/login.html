@@ -78,10 +78,10 @@
         <form method="post">
             {% csrf_token %}
             <label>Username</label>
-            <input type="text" id="username" name="username" placeholder="Enter Username">
+            <input type="text" name="username" placeholder="Enter Username">
 
             <label>Password</label>
-            <input type="password" id="password" name="pass" placeholder="Password">
+            <input type="password" name="pass" placeholder="Password">
 
             <button type="submit">Log In</button>
             <a href="{% url 'signup' %}">Create an account</a>

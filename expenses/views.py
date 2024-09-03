@@ -15,7 +15,6 @@ def HomePage(request):
     context['view_group_id'] = view_group_id
     return render (request,'home.html',context)
 
-
 def SignupPage(request):
     if request.method=='POST':
         uname=request.POST.get('username')
@@ -26,12 +25,10 @@ def SignupPage(request):
         if pass1!=pass2:
             return HttpResponse("Password mismatch!!!")
         else:
-
             my_user=User.objects.create_user(uname,email,pass1)
             my_user.save()
             return redirect('login')
     return render (request,'signup.html')
-
 
 def LoginPage(request):
     if request.method=='POST':
@@ -43,8 +40,38 @@ def LoginPage(request):
             return redirect('home')
         else:
             return HttpResponse ("Username or Password is incorrect!!!")
-
     return render (request,'login.html')
+
+def LogoutPage(request):
+    logout(request)
+    return redirect('login')
+
+@login_required
+def add_friend(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        friend = User.objects.get(username=username)
+        if request.user != friend:
+            friendship_exists = Friendship.objects.filter(user1=request.user, user2=friend).exists()
+            # if friendship_exists:
+            #     return HttpResponse("No such friend exists!")                                                                            
+            if not friendship_exists:
+                Friendship.objects.create(user1=request.user, user2=friend)
+                Friendship.objects.create(user1=friend, user2=request.user)
+        return redirect('friend_list')
+    
+    friends = request.user.friends1.all()  
+   
+    return render(request, 'add_friends.html', {'friends': friends})
+     
+@login_required
+def friend_list(request):
+    friends = Friendship.objects.filter(user2=request.user)
+    friend_users = set()
+    for friend in friends:
+        if friend.user1 != request.user:
+            friend_users.add(friend.user1)
+    return render(request, 'friend_list.html', {'friends': friend_users})
 
 @login_required
 def create_group(request):
@@ -80,6 +107,16 @@ def view_group(request):
     view_group_id = request.GET.get("view_group_id")
     return render(request, 'view_group.html', {'friends': friends, 'groups':groups,'view_group_id':view_group_id})
 
+@login_required
+def delete_friend(request,friend_id):
+    friend = User.objects.get(id=friend_id)
+    friendshipobject=get_object_or_404(Friendship,user1=request.user,user2=friend)
+    friendshipobject2=get_object_or_404(Friendship,user2=request.user,user1=friend)
+    if request.method =='POST':
+        friendshipobject.delete()
+        friendshipobject2.delete()
+        return redirect('friend_list')
+    return render(request,'delete_friend.html',{'friend':friend})
 
 @login_required 
 def delete_group(request,group_id):
@@ -107,37 +144,6 @@ def edit_group(request, group_id):
         group.members.set(new_members)
         return redirect('create_group')
     return render(request, 'edit_group.html', {'group': group, 'friends': friends, 'group_members': group_members})
-
-@login_required
-def add_friend(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        friend = get_object_or_404(User, username=username)
-
-        if request.user != friend:
-            friendship_exists = Friendship.objects.filter(user1=request.user, user2=friend).exists()
-
-            if not friendship_exists:
-                Friendship.objects.create(user1=request.user, user2=friend)
-                Friendship.objects.create(user1=friend, user2=request.user)
-        return redirect('friend_list')
-    
-    friends = request.user.friends1.all()  
-   
-    return render(request, 'add_friends.html', {'friends': friends})
-     
-@login_required
-def friend_list(request):
-    friends = Friendship.objects.filter(user2=request.user)
-    friend_users = set()
-    for friend in friends:
-        if friend.user1 != request.user:
-            friend_users.add(friend.user1)
-    return render(request, 'friend_list.html', {'friends': friend_users})
-
-def LogoutPage(request):
-    logout(request)
-    return redirect('login')
 
 @login_required
 def create_expense(request, group_id):
